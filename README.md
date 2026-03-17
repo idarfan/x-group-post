@@ -29,7 +29,7 @@ npm run dev  # port 5175
 
 - 英文 / 日文 / 簡體中文自動翻譯為繁體中文
 - AI 依台灣團購文風格撰寫完整貼文
-- 運費選項：含/不含（國際運費、稅金、全家店到店、郵寄）
+- 運費選項：國際運費/稅金（checkbox）+ 物流方式單選（全家 $68/$72/$78 或郵寄）
 - 圖片上傳（最多 4 張，拖放支援）
 - 貼文可直接編輯、一鍵複製
 - 歷史記錄儲存與管理
@@ -52,3 +52,18 @@ npm run dev  # port 5175
 - X 深色主題 UI，左右雙欄佈局
 
 **涉及檔案：** `backend/`、`frontend/`、`docs/`、`README.md`
+
+### 2026-03-18 — 物流方式互斥單選 + 全家費率三選一
+
+**動機：** 全家店到店與郵寄為互斥選項，不應同時勾選；全家費率因服務別有 $68 / $72 / $78 三種。
+
+**異動內容：**
+- 物流方式改為 radio 單選：不含物流 / 全家店到店 / 郵寄（三擇一，互斥）
+- 選擇全家店到店後展開費率子選項：$68 / $72 / $78
+- 更新 `ShippingOptions` 型別：`cvs_family + postal` → `delivery + cvs_family_fee`
+- 後端 `PostGeneratorService` 依新結構輸出物流說明至 AI prompt
+- favicon 更換為 X（𝕏）風格黑底白字圖示
+- 頁籤標題改為「X 團購文產生器」
+- 同步更新 `docs/USER_MANUAL.md`、`docs/ARCHITECTURE.md`
+
+**涉及檔案：** `frontend/src/types/index.ts`、`frontend/src/components/ProductInfoForm.tsx`、`frontend/src/App.tsx`、`frontend/src/App.css`、`frontend/public/favicon.svg`、`frontend/index.html`、`backend/app/services/post_generator_service.rb`、`docs/`
