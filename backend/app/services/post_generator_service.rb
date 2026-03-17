@@ -11,14 +11,14 @@ class PostGeneratorService
     client = Anthropic::Client.new(api_key: ENV.fetch("ANTHROPIC_API_KEY"))
     style_guide = File.read(STYLE_PROMPT_PATH)
 
-    response = client.messages(
+    response = client.messages.create(
       model: "claude-sonnet-4-20250514",
       max_tokens: 3000,
       system: style_guide,
       messages: [{ role: "user", content: build_user_prompt }]
     )
 
-    response.dig("content", 0, "text") || ""
+    response.content[0].text || ""
   end
 
   private

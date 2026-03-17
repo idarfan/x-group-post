@@ -9,14 +9,14 @@ class TranslationService
     return { translated_text: @text, detected_language: "zh_tw" } if lang == "zh_tw"
 
     client = Anthropic::Client.new(api_key: ENV.fetch("ANTHROPIC_API_KEY"))
-    response = client.messages(
+    response = client.messages.create(
       model: "claude-sonnet-4-20250514",
       max_tokens: 2000,
       system: build_system_prompt(lang),
       messages: [{ role: "user", content: @text }]
     )
 
-    { translated_text: response.dig("content", 0, "text"), detected_language: lang }
+    { translated_text: response.content[0].text, detected_language: lang }
   end
 
   private
