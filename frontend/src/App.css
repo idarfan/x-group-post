@@ -274,6 +274,37 @@ input::placeholder { color: var(--text-secondary); }
 
 .shipping-note { font-size: 0.8rem; }
 
+/* ── 物流單選群組 ── */
+.shipping-delivery-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding-top: 0.35rem;
+  border-top: 1px solid var(--border);
+}
+
+/* 全家費用子選項 */
+.cvs-fee-group {
+  display: flex;
+  gap: 0.5rem;
+  padding-left: 1.5rem;
+  flex-wrap: wrap;
+}
+.cvs-fee-option {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  cursor: pointer;
+  font-size: 0.8rem;
+  padding: 0.25rem 0.6rem;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--bg-input);
+  transition: border-color 0.15s;
+}
+.cvs-fee-option:hover { border-color: var(--accent); }
+.cvs-fee-option input { width: auto; }
+
 /* ── 生成按鈕 ── */
 .generate-btn {
   background: var(--accent);

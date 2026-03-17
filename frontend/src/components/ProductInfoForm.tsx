@@ -5,19 +5,18 @@ interface Props {
   onChange: (v: ProductInfo) => void;
 }
 
-const SHIPPING_FIELDS: { key: keyof ShippingOptions; label: string; sub?: string }[] = [
-  { key: "intl_shipping", label: "國際運費", sub: "海外寄出" },
-  { key: "tax",           label: "進口稅金", sub: "含稅" },
-  { key: "cvs_family",   label: "全家店到店 $60" },
-  { key: "postal",       label: "郵寄費用", sub: "$80 起" },
-];
+const CVS_FEES = [68, 72, 78] as const;
 
 export default function ProductInfoForm({ value, onChange }: Props) {
   const update = (field: keyof ProductInfo, val: string) =>
     onChange({ ...value, [field]: val });
 
-  const updateShipping = (field: keyof ShippingOptions, val: boolean | string) =>
-    onChange({ ...value, shipping: { ...value.shipping, [field]: val } });
+  const updateShipping = <K extends keyof ShippingOptions>(
+    field: K,
+    val: ShippingOptions[K]
+  ) => onChange({ ...value, shipping: { ...value.shipping, [field]: val } });
+
+  const { delivery, cvs_family_fee } = value.shipping;
 
   return (
     <div className="product-info-form">
@@ -67,12 +66,18 @@ export default function ProductInfoForm({ value, onChange }: Props) {
         <p className="shipping-title">📦 運費說明</p>
         <p className="shipping-hint">勾選「已含」項目，未勾選者將在貼文中註明「不含」</p>
 
+        {/* 國際運費 & 稅金 — 獨立 checkbox */}
         <div className="shipping-grid">
-          {SHIPPING_FIELDS.map(({ key, label, sub }) => (
+          {(
+            [
+              { key: "intl_shipping", label: "國際運費", sub: "海外寄出" },
+              { key: "tax",           label: "進口稅金", sub: "含稅" },
+            ] as const
+          ).map(({ key, label, sub }) => (
             <label key={key} className="shipping-option">
               <input
                 type="checkbox"
-                checked={value.shipping[key] as boolean}
+                checked={value.shipping[key]}
                 onChange={(e) => updateShipping(key, e.target.checked)}
               />
               <span className="shipping-label">
@@ -81,6 +86,67 @@ export default function ProductInfoForm({ value, onChange }: Props) {
               </span>
             </label>
           ))}
+        </div>
+
+        {/* 物流方式 — 互斥單選 */}
+        <div className="shipping-delivery-group">
+          <p className="shipping-label" style={{ marginBottom: "0.35rem" }}>
+            物流方式（已含）
+          </p>
+
+          {/* 不含 */}
+          <label className="shipping-option">
+            <input
+              type="radio"
+              name="delivery"
+              value=""
+              checked={delivery === ""}
+              onChange={() => updateShipping("delivery", "")}
+            />
+            <span className="shipping-label">⚠️ 不含物流費</span>
+          </label>
+
+          {/* 全家店到店 */}
+          <label className="shipping-option">
+            <input
+              type="radio"
+              name="delivery"
+              value="cvs_family"
+              checked={delivery === "cvs_family"}
+              onChange={() => updateShipping("delivery", "cvs_family")}
+            />
+            <span className="shipping-label">✅ 全家店到店</span>
+          </label>
+
+          {/* 全家費用子選項 */}
+          {delivery === "cvs_family" && (
+            <div className="cvs-fee-group">
+              {CVS_FEES.map((fee) => (
+                <label key={fee} className="cvs-fee-option">
+                  <input
+                    type="radio"
+                    name="cvs_family_fee"
+                    value={fee}
+                    checked={cvs_family_fee === fee}
+                    onChange={() => updateShipping("cvs_family_fee", fee)}
+                  />
+                  <span>${fee}</span>
+                </label>
+              ))}
+            </div>
+          )}
+
+          {/* 郵寄 */}
+          <label className="shipping-option">
+            <input
+              type="radio"
+              name="delivery"
+              value="postal"
+              checked={delivery === "postal"}
+              onChange={() => updateShipping("delivery", "postal")}
+            />
+            <span className="shipping-label">✅ 郵寄</span>
+          </label>
         </div>
 
         <input

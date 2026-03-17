@@ -50,13 +50,21 @@ class PostGeneratorService
     return if shipping.blank?
 
     excluded = []
+    excluded << "國際運費" unless shipping["intl_shipping"]
+    excluded << "稅金"     unless shipping["tax"]
 
-    excluded << "國際運費"       unless shipping["intl_shipping"]
-    excluded << "稅金"           unless shipping["tax"]
-    excluded << "全家店到店運費"  unless shipping["cvs_family"]
-    excluded << "郵寄費用"        unless shipping["postal"]
+    delivery = shipping["delivery"].to_s
+    case delivery
+    when "cvs_family"
+      fee = shipping["cvs_family_fee"].to_s.presence || "68"
+      parts << "- 物流：全家店到店 $#{fee}（已含）"
+    when "postal"
+      parts << "- 物流：郵寄（已含）"
+    else
+      excluded << "物流費用（全家店到店或郵寄）"
+    end
 
-    parts << "- ⚠️ 不含（務必在貼文中明確註明）：#{excluded.join('、')}"          if excluded.any?
-    parts << "- 運費備註：#{shipping['note']}"                                    if shipping["note"].present?
+    parts << "- ⚠️ 不含（務必在貼文中明確註明）：#{excluded.join('、')}" if excluded.any?
+    parts << "- 運費備註：#{shipping['note']}" if shipping["note"].present?
   end
 end

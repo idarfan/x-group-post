@@ -20,7 +20,7 @@
 | AI | Anthropic Claude API（claude-sonnet-4-20250514） |
 | HTTP 客戶端 | axios（前端） |
 | CORS | rack-cors（後端） |
-| 圖片上傳 | react-dropzone（前端）+ binary blob（SQLite） |
+| 圖片上傳 | react-dropzone（前端）+ 路徑字串（SQLite） |
 | Toast 通知 | react-hot-toast |
 | Process 管理 | PM2 |
 | Lint | ESLint + `npx tsc --noEmit`（前端）、RuboCop（後端） |
@@ -39,7 +39,7 @@ x-group-post/
 │   │   │   └── images_controller.rb      # 圖片讀取 + 路徑載入
 │   │   ├── models/
 │   │   │   ├── groupbuy_post.rb          # 主記錄（含 shipping_json）
-│   │   │   └── post_image.rb             # 圖片關聯（binary blob）
+│   │   │   └── post_image.rb             # 圖片關聯（image_path + path_type）
 │   │   └── services/
 │   │       ├── translation_service.rb    # Claude API 翻譯（含語言自動偵測）
 │   │       └── post_generator_service.rb # Claude API 撰文（讀取 groupbuy.md）
@@ -59,7 +59,7 @@ x-group-post/
 │   │   ├── components/
 │   │   │   ├── ImageUploader.tsx         # 拖放上傳，最多 4 張
 │   │   │   ├── DescriptionInput.tsx      # 語言選擇 + 原文輸入
-│   │   │   ├── ProductInfoForm.tsx       # 補充資訊 + 運費選項（4 選項）
+│   │   │   ├── ProductInfoForm.tsx       # 補充資訊 + 運費選項（checkbox + 物流單選）
 │   │   │   ├── TranslatedPreview.tsx     # 翻譯結果（可修改）
 │   │   │   ├── PostEditor.tsx            # 單篇貼文（可直接編輯）
 │   │   │   ├── CopyButton.tsx            # 通用複製按鈕
@@ -127,8 +127,10 @@ React（App.tsx#handleGenerate）
               │     ├── 圖片數量
               │     ├── 產品補充資訊（名稱、原價、團購價、期間、下單方式）
               │     └── append_shipping_info()
-              │           ├── included[] → "✅ 已含：國際運費、含稅..."
-              │           └── excluded[] → "⚠️ 不含（務必在貼文中明確註明）：..."
+              │           ├── intl_shipping/tax 未勾選 → excluded[]
+              │           ├── delivery=cvs_family → "物流：全家 $XX（已含）"
+              │           ├── delivery=postal    → "物流：郵寄（已含）"
+              │           └── delivery=""        → excluded["物流費用"]
               └── Anthropic Claude API
                     → 回傳純文字完整貼文（非 JSON、非推文串）
 ```
@@ -141,28 +143,31 @@ React（App.tsx#handleGenerate）
 
 ```typescript
 interface ShippingOptions {
-  intl_shipping: boolean;  // 國際運費
-  tax:           boolean;  // 進口稅金
-  cvs_family:    boolean;  // 全家店到店
-  postal:        boolean;  // 郵寄費用
-  note:          string;   // 自訂備註
+  intl_shipping:  boolean;                    // 國際運費（checkbox）
+  tax:            boolean;                    // 進口稅金（checkbox）
+  delivery:       "" | "cvs_family" | "postal"; // 物流方式（單選互斥）
+  cvs_family_fee: 68 | 72 | 78;               // 全家費率（delivery === "cvs_family" 時有效）
+  note:           string;                     // 自訂備註
 }
 ```
 
 送入 `product_info.shipping` → `PostGeneratorService#append_shipping_info`：
 
-- 勾選（`true`）→ 加入 `included[]` → prompt 中顯示 `✅ 已含：xxx`
-- 未勾選（`false`）→ 加入 `excluded[]` → prompt 中顯示 `⚠️ 不含：xxx（務必在貼文中明確註明）`
+- `intl_shipping` / `tax` 未勾選 → 加入 `excluded[]` → prompt 顯示 `⚠️ 不含：xxx`
+- `delivery === "cvs_family"` → prompt 顯示 `物流：全家店到店 $XX（已含）`
+- `delivery === "postal"` → prompt 顯示 `物流：郵寄（已含）`
+- `delivery === ""` → 加入 `excluded[]`，顯示 `⚠️ 不含物流費用`
 - AI 依 `groupbuy.md` 的「運費呈現規則」在貼文對應段落加入 ✅/⚠️ 標示
 
 ---
 
 ## 圖片儲存策略
 
-- **開發 / 小量**：圖片以 `binary blob` 直接存入 SQLite `post_images.image_data` 欄位（4 張小圖適用）
-- **讀取**：`GET /api/images/:id` 透過 `send_data` 回傳 blob
-- **路徑載入**：`POST /api/images/from_path` 支援 WSL2 路徑（`/mnt/c/...`）、Windows 路徑（`C:\Users\...`）、Linux 路徑，後端自動轉換
-- **擴充**：圖片量大時改用 ActiveStorage，不影響其他邏輯
+- **儲存**：DB 只存路徑字串（`post_images.image_path`）+ 路徑類型（`path_type`）
+- **path_type 自動偵測**：`windows`（`C:\...`）/ `wsl2`（`/mnt/c/...`）/ `linux`（其他）
+- **預覽**：前端使用 `URL.createObjectURL(file)` 在記憶體預覽，不上傳 binary
+- **讀取**：`GET /api/images/:id` 透過 `post_image.resolved_path` 從本機檔案路徑讀取並回傳
+- **Windows 路徑轉換**：`PostImage#resolved_path` 將 `C:\Users\...` 自動轉為 `/mnt/c/Users/...`
 
 ---
 

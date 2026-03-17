@@ -20,8 +20,8 @@ const DEFAULT_PRODUCT_INFO: ProductInfo = {
   shipping: {
     intl_shipping: false,
     tax: false,
-    cvs_family: false,
-    postal: false,
+    delivery: "",
+    cvs_family_fee: 68,
     note: "",
   },
 };

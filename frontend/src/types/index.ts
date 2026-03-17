@@ -6,8 +6,10 @@ export interface ImageEntry {
 export interface ShippingOptions {
   intl_shipping: boolean;
   tax: boolean;
-  cvs_family: boolean;
-  postal: boolean;
+  /** "" = 不含物流、"cvs_family" = 全家店到店（已含）、"postal" = 郵寄（已含） */
+  delivery: "" | "cvs_family" | "postal";
+  /** 全家店到店費用，僅 delivery === "cvs_family" 時有效 */
+  cvs_family_fee: 68 | 72 | 78;
   note: string;
 }
 
