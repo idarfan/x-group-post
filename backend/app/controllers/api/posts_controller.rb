@@ -30,7 +30,9 @@ module Api
       end
 
       if post.save
-        render json: post.as_json(include: :post_images), status: :created
+        render json: post.as_json(
+          include: { post_images: { only: %i[id filename position] } }
+        ), status: :created
       else
         render json: { errors: post.errors.full_messages }, status: :unprocessable_entity
       end
