@@ -1,0 +1,39 @@
+  [1m[35m (128.6ms)[0m  [1m[35mCREATE TABLE "schema_migrations" ("version" varchar NOT NULL PRIMARY KEY) /*application='Backend'*/[0m
+  [1m[35m (0.4ms)[0m  [1m[35mCREATE TABLE "ar_internal_metadata" ("key" varchar NOT NULL PRIMARY KEY, "value" varchar, "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL) /*application='Backend'*/[0m
+  [1m[36mActiveRecord::InternalMetadata Load (0.3ms)[0m  [1m[34mSELECT * FROM "ar_internal_metadata" WHERE "ar_internal_metadata"."key" = 'environment' ORDER BY "ar_internal_metadata"."key" ASC LIMIT 1 /*application='Backend'*/[0m
+  [1m[36mActiveRecord::InternalMetadata Create (0.3ms)[0m  [1m[32mINSERT INTO "ar_internal_metadata" ("key", "value", "created_at", "updated_at") VALUES ('environment', 'development', '2026-03-17 12:32:14.425653', '2026-03-17 12:32:14.425657') RETURNING "key" /*application='Backend'*/[0m
+  [1m[36mActiveRecord::SchemaMigration Load (0.2ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC /*application='Backend'*/[0m
+Migrating to CreateGroupbuyPosts (20260317123112)
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[35mBEGIN immediate TRANSACTION /*application='Backend'*/[0m
+  [1m[35m (1.8ms)[0m  [1m[35mCREATE TABLE "groupbuy_posts" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "product_name" varchar NOT NULL, "original_description" text NOT NULL, "source_language" varchar DEFAULT 'en' NOT NULL, "translated_description" text, "generated_post" text, "edited_post" text, "group_price" varchar, "start_date" date, "end_date" date, "order_method" varchar, "shipping_json" text, "status" varchar DEFAULT 'draft' NOT NULL, "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL) /*application='Backend'*/[0m
+  [1m[36mActiveRecord::SchemaMigration Create (0.3ms)[0m  [1m[32mINSERT INTO "schema_migrations" ("version") VALUES ('20260317123112') RETURNING "version" /*application='Backend'*/[0m
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[35mCOMMIT TRANSACTION /*application='Backend'*/[0m
+Migrating to CreatePostImages (20260317123121)
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[35mBEGIN immediate TRANSACTION /*application='Backend'*/[0m
+  [1m[35m (12.0ms)[0m  [1m[35mCREATE TABLE "post_images" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "groupbuy_post_id" integer NOT NULL, "filename" varchar NOT NULL, "content_type" varchar NOT NULL, "image_data" blob NOT NULL, "position" integer DEFAULT 1 NOT NULL, "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL, CONSTRAINT "fk_rails_7cf8f3beaf"
+FOREIGN KEY ("groupbuy_post_id")
+  REFERENCES "groupbuy_posts" ("id")
+) /*application='Backend'*/[0m
+  [1m[35m (0.2ms)[0m  [1m[35mCREATE INDEX "index_post_images_on_groupbuy_post_id" ON "post_images" ("groupbuy_post_id") /*application='Backend'*/[0m
+  [1m[35m (0.5ms)[0m  [1m[35mCREATE UNIQUE INDEX "index_post_images_on_groupbuy_post_id_and_position" ON "post_images" ("groupbuy_post_id", "position") /*application='Backend'*/[0m
+  [1m[36mActiveRecord::SchemaMigration Create (0.3ms)[0m  [1m[32mINSERT INTO "schema_migrations" ("version") VALUES ('20260317123121') RETURNING "version" /*application='Backend'*/[0m
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[35mCOMMIT TRANSACTION /*application='Backend'*/[0m
+  [1m[36mActiveRecord::SchemaMigration Load (0.1ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC /*application='Backend'*/[0m
+[dotenv] Set [36mANTHROPIC_API_KEY[0m
+[dotenv] Loaded [33m.env[0m
+[dotenv] Set [36mANTHROPIC_API_KEY[0m
+[dotenv] Loaded [33m.env[0m
+Started GET "/" for 127.0.0.1 at 2026-03-17 21:18:54 +0800
+  [1m[36mActiveRecord::SchemaMigration Load (5.3ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC /*application='Backend'*/[0m
+Processing by Rails::WelcomeController#index as HTML
+  Rendering /home/idarfan/.rbenv/versions/4.0.1/lib/ruby/gems/4.0.0/gems/railties-8.1.2/lib/rails/templates/rails/welcome/index.html.erb
+  Rendered /home/idarfan/.rbenv/versions/4.0.1/lib/ruby/gems/4.0.0/gems/railties-8.1.2/lib/rails/templates/rails/welcome/index.html.erb (Duration: 1.8ms | GC: 0.0ms)
+Completed 200 OK in 190ms (Views: 81.9ms | ActiveRecord: 0.0ms (0 queries, 0 cached) | GC: 0.0ms)
+
+
+Started GET "/icon.png" for 127.0.0.1 at 2026-03-17 21:18:55 +0800
+  
+ActionController::RoutingError (No route matches [GET] "/icon.png"):
+  
+[dotenv] Set [36mANTHROPIC_API_KEY[0m
+[dotenv] Loaded [33m.env[0m
