@@ -1,69 +1,82 @@
+import { useCallback } from "react";
+import { useDropzone } from "react-dropzone";
+import type { ImageEntry } from "../types";
+
 interface Props {
-  paths: string[];
-  onChange: (paths: string[]) => void;
+  images: ImageEntry[];
+  onChange: (images: ImageEntry[]) => void;
   max?: number;
 }
 
-const PREVIEW_BASE = "/api/images/from_path?path=";
+export default function ImageUploader({ images, onChange, max = 4 }: Props) {
+  const onDrop = useCallback(
+    (acceptedFiles: File[]) => {
+      const remaining = max - images.length;
+      const newEntries: ImageEntry[] = acceptedFiles
+        .slice(0, remaining)
+        .map((file) => ({ file, path: file.name }));
+      onChange([...images, ...newEntries]);
+    },
+    [images, max, onChange]
+  );
 
-export default function ImageUploader({ paths, onChange, max = 4 }: Props) {
-  const addPath = (raw: string) => {
-    const trimmed = raw.trim();
-    if (!trimmed || paths.includes(trimmed) || paths.length >= max) return;
-    onChange([...paths, trimmed]);
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    onDrop,
+    accept: { "image/*": [".jpg", ".jpeg", ".png", ".webp"] },
+    maxFiles: max - images.length,
+    disabled: images.length >= max,
+  });
+
+  const removeImage = (index: number) => {
+    onChange(images.filter((_, i) => i !== index));
   };
 
-  const removePath = (index: number) => {
-    onChange(paths.filter((_, i) => i !== index));
-  };
-
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter") {
-      addPath((e.currentTarget as HTMLInputElement).value);
-      (e.currentTarget as HTMLInputElement).value = "";
-    }
-  };
-
-  const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
-    if (e.target.value.trim()) {
-      addPath(e.target.value);
-      e.target.value = "";
-    }
+  const updatePath = (index: number, path: string) => {
+    onChange(images.map((entry, i) => i === index ? { ...entry, path } : entry));
   };
 
   return (
     <div className="image-uploader">
-      <label>📸 產品圖片路徑（最多 {max} 張）</label>
-      <p className="hint">支援 Windows（C:\...）、WSL2（/mnt/c/...）、Linux 路徑，輸入後按 Enter 加入</p>
+      <label>📸 產品圖片（最多 {max} 張）</label>
 
-      {paths.length < max && (
-        <input
-          type="text"
-          className="path-input"
-          placeholder="貼上圖片路徑，按 Enter 加入..."
-          onKeyDown={handleKeyDown}
-          onBlur={handleBlur}
-        />
-      )}
+      <div
+        {...getRootProps()}
+        className={`dropzone${isDragActive ? " active" : ""}${images.length >= max ? " disabled" : ""}`}
+      >
+        <input {...getInputProps()} />
+        {images.length >= max ? (
+          <p>已達上限 {max} 張</p>
+        ) : (
+          <p>{isDragActive ? "放開以上傳" : "拖放圖片到此，或點擊選擇"}</p>
+        )}
+      </div>
 
-      {paths.length > 0 && (
-        <div className="image-preview-grid">
-          {paths.map((p, idx) => (
-            <div key={idx} className="image-preview-item">
-              <img
-                src={`${PREVIEW_BASE}${encodeURIComponent(p)}`}
-                alt={`圖${idx + 1}`}
-                onError={(e) => {
-                  (e.currentTarget as HTMLImageElement).style.display = "none";
-                }}
+      {images.length > 0 && (
+        <div className="image-entry-list">
+          {images.map((entry, idx) => (
+            <div key={idx} className="image-entry">
+              <div className="image-thumb-wrap">
+                <img
+                  src={URL.createObjectURL(entry.file)}
+                  alt={`圖${idx + 1}`}
+                />
+                <span className="image-label">圖 {idx + 1}</span>
+                <button
+                  className="remove-btn"
+                  type="button"
+                  onClick={() => removeImage(idx)}
+                >
+                  ✕
+                </button>
+              </div>
+              <input
+                className="path-input"
+                type="text"
+                value={entry.path}
+                onChange={(e) => updatePath(idx, e.target.value)}
+                placeholder="檔案路徑（可輸入完整路徑，如 C:\... 或 /mnt/c/...）"
+                title="儲存時使用此路徑；可改為完整系統路徑"
               />
-              <span className="image-label">圖 {idx + 1}</span>
-              <button className="remove-btn" type="button" onClick={() => removePath(idx)}>
-                ✕
-              </button>
-              <span className="path-badge" title={p}>
-                {p.length > 30 ? `...${p.slice(-28)}` : p}
-              </span>
             </div>
           ))}
         </div>

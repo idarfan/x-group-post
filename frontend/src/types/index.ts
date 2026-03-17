@@ -1,3 +1,8 @@
+export interface ImageEntry {
+  file: File;    // 用於預覽（blob URL）
+  path: string;  // 儲存到 DB 的路徑（預設檔名，可改為完整路徑）
+}
+
 export interface ShippingOptions {
   intl_shipping: boolean;
   tax: boolean;

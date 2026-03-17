@@ -7,7 +7,7 @@ import TranslatedPreview from "./components/TranslatedPreview";
 import PostEditor from "./components/PostEditor";
 import HistoryPanel from "./components/HistoryPanel";
 import { useGroupBuyApi } from "./hooks/useGroupBuyApi";
-import type { ProductInfo } from "./types";
+import type { ProductInfo, ImageEntry } from "./types";
 import "./App.css";
 
 const DEFAULT_PRODUCT_INFO: ProductInfo = {
@@ -27,7 +27,7 @@ const DEFAULT_PRODUCT_INFO: ProductInfo = {
 };
 
 export default function App() {
-  const [imagePaths, setImagePaths] = useState<string[]>([]);
+  const [images, setImages] = useState<ImageEntry[]>([]);
   const [description, setDescription] = useState("");
   const [sourceLang, setSourceLang] = useState("en");
   const [productInfo, setProductInfo] = useState<ProductInfo>(DEFAULT_PRODUCT_INFO);
@@ -45,7 +45,7 @@ export default function App() {
 
     const genResult = await api.generate(
       transResult.translated_text,
-      imagePaths.length,
+      images.length,
       productInfo
     );
     setGeneratedPost(genResult.post);
@@ -54,7 +54,7 @@ export default function App() {
   const handleRegenerate = async () => {
     if (!translatedText.trim()) return;
 
-    const genResult = await api.generate(translatedText, imagePaths.length, productInfo);
+    const genResult = await api.generate(translatedText, images.length, productInfo);
     setGeneratedPost(genResult.post);
   };
 
@@ -74,7 +74,7 @@ export default function App() {
         shipping_json: JSON.stringify(productInfo.shipping),
         status: "draft",
       },
-      imagePaths
+      images.map((e) => e.path)
     );
   };
 
@@ -96,7 +96,7 @@ export default function App() {
       <main className="app-main">
         {/* ── 左欄：輸入 ── */}
         <section className="input-panel">
-          <ImageUploader paths={imagePaths} onChange={setImagePaths} max={4} />
+          <ImageUploader images={images} onChange={setImages} max={4} />
 
           <DescriptionInput
             value={description}

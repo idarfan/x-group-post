@@ -90,8 +90,44 @@ body {
 
 label { font-weight: 600; font-size: 0.875rem; color: var(--text-primary); }
 
+/* ── 圖片上傳 ── */
+.dropzone {
+  border: 2px dashed var(--border);
+  border-radius: 8px;
+  padding: 1.25rem;
+  text-align: center;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: border-color 0.15s;
+}
+.dropzone:hover,
+.dropzone.active { border-color: var(--accent); color: var(--text-primary); }
+.dropzone.disabled { cursor: not-allowed; opacity: 0.5; }
+
+/* 圖片條目（縮圖 + 路徑輸入橫排） */
+.image-entry-list { display: flex; flex-direction: column; gap: 0.5rem; }
+.image-entry {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.4rem 0.6rem;
+}
+.image-thumb-wrap {
+  position: relative;
+  width: 56px;
+  height: 56px;
+  flex-shrink: 0;
+  border-radius: 6px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+}
+.image-thumb-wrap img { width: 100%; height: 100%; object-fit: cover; }
+
 /* ── 圖片路徑輸入 ── */
-.path-input { font-family: monospace; font-size: 0.8rem; }
+.path-input { font-family: monospace; font-size: 0.78rem; flex: 1; }
 
 .image-preview-grid {
   display: grid;
