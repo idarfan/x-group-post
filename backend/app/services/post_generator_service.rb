@@ -49,15 +49,13 @@ class PostGeneratorService
   def append_shipping_info(parts, shipping)
     return if shipping.blank?
 
-    included = []
     excluded = []
 
-    included << "含國際運費"    if shipping["intl_shipping"];  excluded << "國際運費"       unless shipping["intl_shipping"]
-    included << "含稅"          if shipping["tax"];            excluded << "稅金"           unless shipping["tax"]
-    included << "全家店到店 $60" if shipping["cvs_family"];    excluded << "全家店到店運費"  unless shipping["cvs_family"]
-    included << "郵寄 $80 起"   if shipping["postal"];        excluded << "郵寄費用"        unless shipping["postal"]
+    excluded << "國際運費"       unless shipping["intl_shipping"]
+    excluded << "稅金"           unless shipping["tax"]
+    excluded << "全家店到店運費"  unless shipping["cvs_family"]
+    excluded << "郵寄費用"        unless shipping["postal"]
 
-    parts << "- ✅ 已含：#{included.join('、')}"                                 if included.any?
     parts << "- ⚠️ 不含（務必在貼文中明確註明）：#{excluded.join('、')}"          if excluded.any?
     parts << "- 運費備註：#{shipping['note']}"                                    if shipping["note"].present?
   end

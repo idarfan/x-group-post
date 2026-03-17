@@ -6,7 +6,7 @@ interface Props {
 }
 
 const SHIPPING_FIELDS: { key: keyof ShippingOptions; label: string; sub?: string }[] = [
-  { key: "intl_shipping", label: "國際運費", sub: "由日本/海外寄出" },
+  { key: "intl_shipping", label: "國際運費", sub: "海外寄出" },
   { key: "tax",           label: "進口稅金", sub: "含稅" },
   { key: "cvs_family",   label: "全家店到店 $60" },
   { key: "postal",       label: "郵寄費用", sub: "$80 起" },
