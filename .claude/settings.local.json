@@ -1,0 +1,26 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(/home/idarfan/.claude/plugins/cache/ruby-skills/ruby-skills/0.5.0/skills/ruby-version-manager/detect.sh)",
+      "Bash(rails new:*)",
+      "Bash(wait)",
+      "Bash(bundle install:*)",
+      "Bash(bundle exec:*)",
+      "Bash(npm create:*)",
+      "Bash(npm install:*)",
+      "Bash(npx tsc:*)",
+      "Bash(pm2 --version)",
+      "Bash(pm2 start:*)",
+      "Bash(pm2 save:*)",
+      "Bash(pm2 startup:*)",
+      "Bash(pm2 restart:*)",
+      "Bash(git init:*)",
+      "Bash(git add:*)",
+      "Bash(git branch:*)",
+      "Bash(git rm:*)",
+      "Bash(git commit:*)",
+      "Bash(pm2 logs:*)",
+      "Bash(npm uninstall:*)"
+    ]
+  }
+}

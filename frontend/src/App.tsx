@@ -27,7 +27,7 @@ const DEFAULT_PRODUCT_INFO: ProductInfo = {
 };
 
 export default function App() {
-  const [images, setImages] = useState<File[]>([]);
+  const [imagePaths, setImagePaths] = useState<string[]>([]);
   const [description, setDescription] = useState("");
   const [sourceLang, setSourceLang] = useState("en");
   const [productInfo, setProductInfo] = useState<ProductInfo>(DEFAULT_PRODUCT_INFO);
@@ -45,7 +45,7 @@ export default function App() {
 
     const genResult = await api.generate(
       transResult.translated_text,
-      images.length,
+      imagePaths.length,
       productInfo
     );
     setGeneratedPost(genResult.post);
@@ -54,7 +54,7 @@ export default function App() {
   const handleRegenerate = async () => {
     if (!translatedText.trim()) return;
 
-    const genResult = await api.generate(translatedText, images.length, productInfo);
+    const genResult = await api.generate(translatedText, imagePaths.length, productInfo);
     setGeneratedPost(genResult.post);
   };
 
@@ -74,7 +74,7 @@ export default function App() {
         shipping_json: JSON.stringify(productInfo.shipping),
         status: "draft",
       },
-      images
+      imagePaths
     );
   };
 
@@ -96,7 +96,7 @@ export default function App() {
       <main className="app-main">
         {/* ── 左欄：輸入 ── */}
         <section className="input-panel">
-          <ImageUploader images={images} onChange={setImages} max={4} />
+          <ImageUploader paths={imagePaths} onChange={setImagePaths} max={4} />
 
           <DescriptionInput
             value={description}

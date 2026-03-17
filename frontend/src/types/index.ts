@@ -29,6 +29,8 @@ export interface PostImage {
   id: number;
   filename: string;
   position: number;
+  image_path: string;
+  path_type: "windows" | "wsl2" | "linux";
 }
 
 export interface TranslateResponse {

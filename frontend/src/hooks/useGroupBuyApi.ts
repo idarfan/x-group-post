@@ -49,18 +49,13 @@ export function useGroupBuyApi() {
 
   const savePost = async (
     postData: Record<string, string>,
-    imageFiles: File[]
+    imagePaths: string[]
   ): Promise<GroupbuyPost> => {
     setLoading(true);
     try {
-      const formData = new FormData();
-      Object.entries(postData).forEach(([key, val]) => {
-        if (val != null) formData.append(key, val);
-      });
-      imageFiles.forEach((file) => formData.append("images[]", file));
-
-      const { data } = await axios.post<GroupbuyPost>(`${API_BASE}/posts`, formData, {
-        headers: { "Content-Type": "multipart/form-data" },
+      const { data } = await axios.post<GroupbuyPost>(`${API_BASE}/posts`, {
+        ...postData,
+        image_paths: imagePaths,
       });
       toast.success("已儲存！");
       return data;
