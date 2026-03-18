@@ -1,5 +1,6 @@
 # Backend
 backend/.env
+backend/config/master.key
 backend/log/
 backend/tmp/
 backend/storage/
