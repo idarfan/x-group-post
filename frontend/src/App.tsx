@@ -6,7 +6,9 @@ import ProductInfoForm from "./components/ProductInfoForm";
 import TranslatedPreview from "./components/TranslatedPreview";
 import PostEditor from "./components/PostEditor";
 import HistoryPanel from "./components/HistoryPanel";
+import StylePanel from "./components/StylePanel";
 import { useGroupBuyApi } from "./hooks/useGroupBuyApi";
+import { useTheme } from "./hooks/useTheme";
 import type { ProductInfo, ImageEntry } from "./types";
 import "./App.css";
 
@@ -34,8 +36,10 @@ export default function App() {
   const [translatedText, setTranslatedText] = useState("");
   const [generatedPost, setGeneratedPost] = useState("");
   const [showHistory, setShowHistory] = useState(false);
+  const [showStyle, setShowStyle] = useState(false);
 
   const api = useGroupBuyApi();
+  const { theme, preset, updateTheme, applyPreset, resetTheme } = useTheme();
 
   const handleGenerate = async () => {
     if (!description.trim()) return;
@@ -84,13 +88,22 @@ export default function App() {
 
       <header className="app-header">
         <h1>🛒 X 團購文產生器</h1>
-        <button
-          type="button"
-          className="history-btn"
-          onClick={() => setShowHistory(true)}
-        >
-          📋 歷史記錄
-        </button>
+        <div style={{ display: "flex", gap: "0.5rem" }}>
+          <button
+            type="button"
+            className="style-btn"
+            onClick={() => setShowStyle(true)}
+          >
+            🎨 UI Style
+          </button>
+          <button
+            type="button"
+            className="history-btn"
+            onClick={() => setShowHistory(true)}
+          >
+            📋 歷史記錄
+          </button>
+        </div>
       </header>
 
       <main className="app-main">
@@ -157,6 +170,17 @@ export default function App() {
       </main>
 
       {showHistory && <HistoryPanel onClose={() => setShowHistory(false)} />}
+
+      {showStyle && (
+        <StylePanel
+          onClose={() => setShowStyle(false)}
+          theme={theme}
+          preset={preset}
+          updateTheme={updateTheme}
+          applyPreset={applyPreset}
+          resetTheme={resetTheme}
+        />
+      )}
     </div>
   );
 }

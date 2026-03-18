@@ -40,6 +40,45 @@ export interface PostImage {
   path_type: "windows" | "wsl2" | "linux";
 }
 
+export interface ThemeConfig {
+  // 背景顏色
+  bgPrimary: string;
+  bgCard: string;
+  bgInput: string;
+  // 文字顏色
+  textPrimary: string;
+  textSecondary: string;
+  // 強調色
+  accent: string;
+  accentHover: string;
+  focusColor: string;   // 輸入框 focus 邊框色
+  danger: string;
+  success: string;
+  warning: string;
+  // 邊框
+  border: string;
+  radius: number;         // px
+  // 字體
+  fontFamily: string;
+  fontSizeBase: number;   // px
+  fontSizeSm: number;     // px
+  fontSizeLg: number;     // px
+  fontSizeXl: number;     // px
+  fontWeightNormal: number;
+  fontWeightBold: number;
+  lineHeight: number;
+  letterSpacing: number;  // px
+  // 間距 (rem)
+  spacingSm: number;
+  spacingMd: number;
+  spacingLg: number;
+  // 特效
+  shadowEnabled: boolean;
+  transitionSpeed: number; // ms
+  backdropBlurEnabled: boolean;
+  inputOpacity: number;   // 0~1
+}
+
 export interface TranslateResponse {
   translated_text: string;
   detected_language: string;

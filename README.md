@@ -39,6 +39,37 @@ npm run dev  # port 5175
 
 ## 變更記錄
 
+### 2026-03-18 — Storybook + Chromatic 視覺回歸測試 + Focus 色 + UI 修正
+
+**動機：** 加入視覺回歸測試防止 CSS 排版問題（元素交疊、截斷、間距錯誤）；修正 StylePanel 顏色縮圖太小、Section 內容截斷、輸入框 focus 無高亮等視覺問題。
+
+**異動內容：**
+- 安裝 Storybook 10 + Chromatic + Playwright，建立雙 Vitest project（unit / storybook）
+- 新增 4 個 Stories：`StylePanel`、`CopyButton`、`PostEditor`、`TranslatedPreview`（含 play function 展開所有 Section）
+- 顏色縮圖從 32×24px 放大為 **56×32px**（隱藏原生 input，外層 label 顯示色塊）
+- 移除 `.sp-section { overflow: hidden }`，修正 Section 展開時內容截斷問題
+- 展開中的 Section 加橘色高亮邊框（`border-color: #f97316`）
+- 新增 `--focus-color`（預設 `#a855f7` 亮紫）CSS 變數：輸入框 focus 時顯示亮紫邊框 + 光暈
+- `ThemeConfig` 新增 `focusColor` 欄位，Style Panel 「強調色」section 開放設定
+- Chromatic Build 1–5 完成，視覺快照 17 個 stories
+- `.env` 加入 `CHROMATIC_PROJECT_TOKEN` 與 `OBSIDIAN_API_KEY`
+
+**涉及檔案：** `frontend/src/types/index.ts`、`frontend/src/hooks/useTheme.ts`、`frontend/src/components/StylePanel.tsx`、`frontend/src/App.css`、`frontend/.storybook/`、`frontend/vite.config.ts`、`frontend/package.json`、`frontend/.env`、`frontend/.gitignore`
+
+### 2026-03-18 — UI Style Panel
+
+**動機：** 讓使用者能自訂 app 外觀，並提供三套預設主題（暗色系、Ubuntu GNOME、macOS），設定刷新後自動恢復。
+
+**異動內容：**
+- 新增 `src/hooks/useTheme.ts`：管理 ThemeConfig state、三套 PRESETS、localStorage 持久化、`applyPreset` / `updateTheme` / `resetTheme`
+- 新增 `src/components/StylePanel.tsx`：右滑動側邊欄，涵蓋顏色、字體、排版、間距、特效共 8 個可折疊 Section，底部重設按鈕（二次確認）
+- 擴充 `src/types/index.ts`：新增 `ThemeConfig` interface（28 個屬性）
+- 擴充 `src/App.css`：新增 17 個 CSS 變數（字體、間距、特效）及 StylePanel 全部樣式
+- 修改 `src/App.tsx`：Header 加入「🎨 UI Style」按鈕，整合 useTheme hook
+- 建立測試：`useTheme.test.ts`（20 個）、`StylePanel.test.tsx`（18 個），共 38 個全數通過
+
+**涉及檔案：** `src/types/index.ts`, `src/hooks/useTheme.ts`, `src/hooks/useTheme.test.ts`, `src/components/StylePanel.tsx`, `src/components/StylePanel.test.tsx`, `src/App.css`, `src/App.tsx`, `vite.config.ts`, `package.json`
+
 ### 2026-03-17 — 初始建立
 
 **動機：** 協助 X 付費帳戶使用者快速產生專業台灣風格的團購貼文。
